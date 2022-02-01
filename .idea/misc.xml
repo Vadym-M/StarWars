@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Android Studio projects/StarWars/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Android Studio projects/StarWars/app/src/main/res/layout/fragment_detail.xml" value="0.18802083333333333" />
+        <entry key="..\:/Android Studio projects/StarWars/app/src/main/res/layout/fragment_favorite.xml" value="0.17395833333333333" />
+        <entry key="..\:/Android Studio projects/StarWars/app/src/main/res/layout/fragment_home.xml" value="0.18802083333333333" />
       </map>
     </option>
   </component>
