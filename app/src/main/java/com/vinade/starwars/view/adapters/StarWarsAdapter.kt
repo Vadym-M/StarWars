@@ -3,6 +3,7 @@ package com.vinade.starwars.view.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.vinade.starwars.R
 import com.vinade.starwars.databinding.ItemRecyclerViewBinding
 import com.vinade.starwars.model.Result
 
@@ -32,8 +33,8 @@ class StarWarsAdapter : RecyclerView.Adapter<StarWarsAdapter.ViewHolder>() {
         val item = items[position]
         holder.binding.apply {
             itemName.text = item.name
-            itemMass.text = item.mass
-            itemHeight.text = item.height
+            itemMass.text = holder.binding.root.context.getString(R.string.mass_d, item.mass)
+            itemHeight.text = holder.binding.root.context.getString(R.string.height_d, item.height)
         }
     }
 
