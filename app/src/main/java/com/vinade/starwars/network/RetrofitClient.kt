@@ -6,16 +6,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private var retrofit: Retrofit? = null
-
     fun getClient():Retrofit{
-        if (retrofit == null){
-            retrofit = Retrofit.Builder()
+           return Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         }
-        return retrofit!!
+    val apiStarWars: ApiStarWars = getClient().create(ApiStarWars::class.java)
     }
-
-}
