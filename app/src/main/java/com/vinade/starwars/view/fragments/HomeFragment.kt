@@ -5,18 +5,48 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.vinade.starwars.R
+import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.vinade.starwars.databinding.FragmentHomeBinding
+import com.vinade.starwars.repository.StarWarsRepository
+import com.vinade.starwars.view.adapters.StarWarsAdapter
+import com.vinade.starwars.viewmodel.StarWarsViewModel
+import com.vinade.starwars.viewmodel.ViewModelFactory
 
 
 class HomeFragment : Fragment() {
 
+    lateinit var binding: FragmentHomeBinding
+    lateinit var viewModel: StarWarsViewModel
+    lateinit var adapterSW: StarWarsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        adapterSW = StarWarsAdapter()
+        binding.homeRecycler.apply {
+            adapter = adapterSW
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        val repo = StarWarsRepository()
+        viewModel = ViewModelProvider(this, ViewModelFactory(repo)).get(StarWarsViewModel::class.java)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.result.observe(viewLifecycleOwner) {
+            adapterSW.setAdapter(it)
+        }
+
+        adapterSW.onItemClick = {
+            Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     companion object {
