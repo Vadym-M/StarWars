@@ -1,10 +1,13 @@
 package com.vinade.starwars.model
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @Entity(tableName = "favorite")
 data class Result(
     //@PrimaryKey val id: Int? = null,
@@ -41,4 +44,4 @@ data class Result(
     val url: String,
     @ColumnInfo(name = "vehicles")
     val vehicles: List<String>
-)
+): Parcelable

@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.vinade.starwars.R
 import com.vinade.starwars.databinding.FragmentHomeBinding
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.StarWarsRepository
@@ -74,6 +76,11 @@ class HomeFragment : Fragment() {
         }
 
         adapterSW.onItemClick = {
+            val fragment = DetailFragment.newInstance(it)
+            parentFragmentManager.commit {
+                addToBackStack(null)
+                replace(R.id.fragmentContainer, fragment)
+            }
             Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
             //viewModel.insertItem(it)
         }
