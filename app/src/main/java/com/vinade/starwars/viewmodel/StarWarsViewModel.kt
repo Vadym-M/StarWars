@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.StarWarsRepository
+import com.vinade.starwars.util.APIResult
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
 class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel() {
-    private var _result = MutableLiveData<List<Result>>()
-    val result: LiveData<List<Result>>
+    private var _result = MutableLiveData<APIResult<List<Result>>>()
+    val result: LiveData<APIResult<List<Result>>>
     get() = _result
 
     private var _favorites = MutableLiveData<List<Result>>()
@@ -22,8 +24,18 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
     }
     private fun getPeoplePage(){
         viewModelScope.launch {
+                _result.value = APIResult.Loading()
+            try {
                 val response = repository.getPeoplePage()
-                _result.postValue(response.body()!!.results)
+                if(response.isSuccessful){
+                    _result.value = APIResult.Success(response.body()!!.results)
+                }else{
+                    _result.value = APIResult.Error(response.message())
+                }
+
+            }catch (e :Exception){
+                _result.value = APIResult.Error(e.message.toString())
+            }
         }
     }
     fun getFavorites(){
@@ -37,7 +49,13 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
             repository.insert(it)
         }
     }
-    fun delete() = viewModelScope.launch {
-        repository.deleteAll()
+
+    fun deleteFavorite(favorite: Result) = viewModelScope.launch {
+        val list = _favorites.value as MutableList
+        val index = list.indexOf(favorite)
+        list.remove(favorite)
+        _favorites.postValue(list as List<Result>)
+
+        repository.deleteFavoriteByName(favorite.name)
     }
 }

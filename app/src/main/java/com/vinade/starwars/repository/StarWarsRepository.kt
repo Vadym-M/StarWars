@@ -12,7 +12,7 @@ class StarWarsRepository(private val dao: StarWarsDao) {
 
     suspend fun getFavorites() = dao.getFavorites()
 
-    suspend fun deleteAll() = dao.deleteAll()
+    suspend fun deleteFavoriteByName(name: String) = dao.deleteFavoriteByName(name)
 
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

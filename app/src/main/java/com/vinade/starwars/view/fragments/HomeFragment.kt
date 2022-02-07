@@ -13,6 +13,7 @@ import com.vinade.starwars.databinding.FragmentHomeBinding
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.StarWarsRepository
 import com.vinade.starwars.room.StarWarsRoomDatabase
+import com.vinade.starwars.util.APIResult
 import com.vinade.starwars.view.adapters.StarWarsAdapter
 import com.vinade.starwars.viewmodel.StarWarsViewModel
 import com.vinade.starwars.viewmodel.ViewModelFactory
@@ -43,8 +44,17 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.d("debug", "created")
-        viewModel.result.observe(viewLifecycleOwner) {
-            adapterSW.setAdapter(it)
+        viewModel.result.observe(viewLifecycleOwner) {result->
+            when(result){
+                is APIResult.Loading -> binding.homeProgressBar.visibility = View.VISIBLE
+                is APIResult.Success -> {
+                    result.data?.let { adapterSW.setAdapter(it)
+                        binding.homeProgressBar.visibility = View.GONE
+                    }
+                }
+                is APIResult.Error -> Toast.makeText(requireContext(), result.msg, Toast.LENGTH_SHORT).show()
+            }
+
         }
 
         adapterSW.onItemClick = {

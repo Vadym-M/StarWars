@@ -2,7 +2,6 @@ package com.vinade.starwars.room
 
 import android.content.Context
 import androidx.room.*
-import androidx.room.migration.AutoMigrationSpec
 import com.vinade.starwars.model.Result
 
 

@@ -13,6 +13,6 @@ interface StarWarsDao {
     suspend fun getFavorites(): List<Result>
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(favorite: Result)
-    @Query("DELETE FROM favorite")
-    suspend fun deleteAll()
+    @Query("DELETE FROM favorite WHERE name = :deleteName")
+    suspend fun deleteFavoriteByName(deleteName : String)
 }

@@ -48,6 +48,7 @@ class FavoriteFragment : Fragment() {
         }
 
         adapterSW.onItemClick = {
+            viewModel.deleteFavorite(it)
             Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
         }
     }
