@@ -22,28 +22,35 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //baseContext.deleteDatabase("favorite")
+
+        if(savedInstanceState == null){
+            //binding.bottomNavigation.selectedItemId = R.id.home
+            supportFragmentManager.commit {
+                replace(R.id.fragmentContainer, HomeFragment())
+            }
+        }
 
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.home -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, HomeFragment())
+                    if(binding.bottomNavigation.selectedItemId != R.id.home){
+                        supportFragmentManager.commit {
+                            replace(R.id.fragmentContainer, HomeFragment())
+                        }
                     }
-                 true
+                    true
                 }
                 R.id.favorite -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, FavoriteFragment())
+                    if (binding.bottomNavigation.selectedItemId != R.id.favorite){
+                        supportFragmentManager.commit {
+                            replace(R.id.fragmentContainer, FavoriteFragment())}
                     }
-                 true
+                    true
                 }
                 else -> false
             }
         }
-        if(savedInstanceState == null){
-            binding.bottomNavigation.selectedItemId = R.id.home
-        }
+
 
 
     }

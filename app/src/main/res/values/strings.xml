@@ -6,4 +6,9 @@
     <string name="favorite">Favorite</string>
     <string name="mass_d">Mass: %s</string>
     <string name="height_d">Height: %s</string>
+    <string name="hair_color_s">Hair color: %s</string>
+    <string name="skin_color_s">Skin color: %s</string>
+    <string name="eye_color_s">Eye color: %s</string>
+    <string name="gender_s">Gender: %s</string>
+    <string name="films">Films</string>
 </resources>

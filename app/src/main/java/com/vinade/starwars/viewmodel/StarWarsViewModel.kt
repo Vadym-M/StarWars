@@ -20,22 +20,29 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
     val favorites: LiveData<List<Result>>
         get() = _favorites
 
+    private val currentList  = mutableListOf<AdapterDataType>()
+
     private var pageCounter = 1
+    private var isProcess = false
+    private var isLastPage = false
 
     init {
         getPeoplePage()
     }
     fun getPeoplePage(){
-        viewModelScope.launch {
+        if (!isProcess && !isLastPage){ viewModelScope.launch {
                 _result.value = APIResult.Loading()
+            isProcess = true
             try {
                 val response = repository.getPeoplePage(pageCounter)
                 if(response.isSuccessful){
-                    val list = mutableListOf<AdapterDataType>()
-                    list.add(AdapterDataType.Header("Page number: $pageCounter"))
-                    response.body()!!.results.forEach { list.add(AdapterDataType.Item(it)) }
-                    _result.value = APIResult.Success(list)
+                    currentList.add(AdapterDataType.Header("Page number: $pageCounter"))
+                    response.body()!!.results.forEach { currentList.add(AdapterDataType.Item(it)) }
+                    _result.value = APIResult.Success(currentList)
                     pageCounter++
+                    if(response.body()!!.next == null){
+                        isLastPage = true
+                    }
                 }else{
                     _result.value = APIResult.Error(response.message())
                 }
@@ -43,8 +50,9 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
             }catch (e :Exception){
                 _result.value = APIResult.Error(e.message.toString())
             }
+            isProcess = false
         }
-    }
+    }}
     fun getFavorites(){
         viewModelScope.launch {
             val response = repository.getFavorites()

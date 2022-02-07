@@ -1,5 +1,6 @@
 package com.vinade.starwars.view.adapters
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,10 @@ import com.vinade.starwars.util.AdapterDataType
 import com.vinade.starwars.util.getResult
 
 class StarWarsAdapter : RecyclerView.Adapter<StarWarsAdapter.ViewHolder>() {
+
+    init {
+        Log.d("debug", "AdapterCreated")
+    }
 
     var onItemClick: ((Result) -> Unit)? = null
     private var items = mutableListOf<AdapterDataType>()
@@ -30,8 +35,8 @@ class StarWarsAdapter : RecyclerView.Adapter<StarWarsAdapter.ViewHolder>() {
         }
         private fun bindItem(item: AdapterDataType.Item){
             view.findViewById<TextView>(R.id.itemName)?.text = item.data.name
-            view.findViewById<TextView>(R.id.itemMass)?.text = view.context.getString(R.string.mass_d,  item.data.mass)
-            view.findViewById<TextView>(R.id.itemHeight)?.text = view.context.getString(R.string.height_d,  item.data.height)
+//            view.findViewById<TextView>(R.id.itemMass)?.text = view.context.getString(R.string.mass_d,  item.data.mass)
+//            view.findViewById<TextView>(R.id.itemHeight)?.text = view.context.getString(R.string.height_d,  item.data.height)
 
         }
 
@@ -73,7 +78,7 @@ class StarWarsAdapter : RecyclerView.Adapter<StarWarsAdapter.ViewHolder>() {
     }
 
     fun setAdapter(newItems: List<AdapterDataType>){
-        items.apply { addAll(newItems) }
+        items = newItems as MutableList<AdapterDataType>
         notifyDataSetChanged()
     }
 

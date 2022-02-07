@@ -26,6 +26,11 @@ class HomeFragment : Fragment() {
     lateinit var viewModel: StarWarsViewModel
     lateinit var adapterSW: StarWarsAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("debug", "onCreate fragment")
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
