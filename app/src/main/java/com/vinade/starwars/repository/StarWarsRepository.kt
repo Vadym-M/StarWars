@@ -8,7 +8,7 @@ import com.vinade.starwars.room.StarWarsDao
 
 class StarWarsRepository(private val dao: StarWarsDao) {
 
-    suspend fun getPeoplePage() = RetrofitClient.apiStarWars.getPeoplePage()
+    suspend fun getPeoplePage(page: Int) = RetrofitClient.apiStarWars.getPeoplePage(page)
 
     suspend fun getFavorites() = dao.getFavorites()
 

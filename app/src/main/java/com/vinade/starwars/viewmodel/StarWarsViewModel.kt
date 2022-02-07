@@ -25,16 +25,17 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
     init {
         getPeoplePage()
     }
-    private fun getPeoplePage(){
+    fun getPeoplePage(){
         viewModelScope.launch {
                 _result.value = APIResult.Loading()
             try {
-                val response = repository.getPeoplePage()
+                val response = repository.getPeoplePage(pageCounter)
                 if(response.isSuccessful){
                     val list = mutableListOf<AdapterDataType>()
                     list.add(AdapterDataType.Header("Page number: $pageCounter"))
                     response.body()!!.results.forEach { list.add(AdapterDataType.Item(it)) }
                     _result.value = APIResult.Success(list)
+                    pageCounter++
                 }else{
                     _result.value = APIResult.Error(response.message())
                 }
@@ -50,6 +51,7 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
             _favorites.postValue(response)
         }
     }
+
     fun insertItem(it: Result){
         viewModelScope.launch {
             repository.insert(it)
