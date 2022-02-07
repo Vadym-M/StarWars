@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.vinade.starwars.databinding.FragmentHomeBinding
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.StarWarsRepository
@@ -35,6 +36,16 @@ class HomeFragment : Fragment() {
             adapter = adapterSW
             layoutManager = LinearLayoutManager(requireContext())
         }
+        binding.homeRecycler.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if(!binding.homeRecycler.canScrollVertically(1)){
+                        viewModel.getPeoplePage()
+                    }
+                }
+            }
+        )
         val dao: StarWarsRoomDatabase = StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
         val repo = StarWarsRepository(dao.favoriteDao())
         viewModel = ViewModelProvider(this, ViewModelFactory(repo))[StarWarsViewModel::class.java]
