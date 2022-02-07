@@ -2,12 +2,15 @@ package com.vinade.starwars.view.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.vinade.starwars.R
 import com.vinade.starwars.databinding.ActivityMainBinding
 import com.vinade.starwars.repository.StarWarsRepository
+import com.vinade.starwars.view.fragments.DetailFragment
 import com.vinade.starwars.view.fragments.FavoriteFragment
 import com.vinade.starwars.view.fragments.HomeFragment
 import com.vinade.starwars.viewmodel.StarWarsViewModel
@@ -30,6 +33,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         binding.bottomNavigation.setOnItemSelectedListener {
             when(it.itemId){
                 R.id.home -> {
@@ -49,6 +53,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
+        }
+        fun hideBottomBar(){
+            binding.bottomNavigation.visibility = View.GONE
         }
 
 
