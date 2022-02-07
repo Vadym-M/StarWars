@@ -44,12 +44,12 @@ class FavoriteFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.favorites.observe(viewLifecycleOwner) {
-            adapterSW.setAdapter(it)
+           // adapterSW.setAdapter(it)
         }
 
         adapterSW.onItemClick = {
-            viewModel.deleteFavorite(it)
-            Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
+           // viewModel.deleteFavorite(it)
+           // Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
         }
     }
 

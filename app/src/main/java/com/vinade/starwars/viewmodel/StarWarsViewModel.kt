@@ -7,17 +7,20 @@ import androidx.lifecycle.viewModelScope
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.StarWarsRepository
 import com.vinade.starwars.util.APIResult
+import com.vinade.starwars.util.AdapterDataType
 import kotlinx.coroutines.launch
 import java.lang.Exception
 
 class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel() {
-    private var _result = MutableLiveData<APIResult<List<Result>>>()
-    val result: LiveData<APIResult<List<Result>>>
+    private var _result = MutableLiveData<APIResult<List<AdapterDataType>>>()
+    val result: LiveData<APIResult<List<AdapterDataType>>>
     get() = _result
 
     private var _favorites = MutableLiveData<List<Result>>()
     val favorites: LiveData<List<Result>>
         get() = _favorites
+
+    private var pageCounter = 1
 
     init {
         getPeoplePage()
@@ -28,7 +31,10 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
             try {
                 val response = repository.getPeoplePage()
                 if(response.isSuccessful){
-                    _result.value = APIResult.Success(response.body()!!.results)
+                    val list = mutableListOf<AdapterDataType>()
+                    list.add(AdapterDataType.Header("Page number: $pageCounter"))
+                    response.body()!!.results.forEach { list.add(AdapterDataType.Item(it)) }
+                    _result.value = APIResult.Success(list)
                 }else{
                     _result.value = APIResult.Error(response.message())
                 }

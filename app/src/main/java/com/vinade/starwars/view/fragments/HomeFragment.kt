@@ -58,7 +58,8 @@ class HomeFragment : Fragment() {
         }
 
         adapterSW.onItemClick = {
-            viewModel.insertItem(it)
+            Toast.makeText(requireContext(), it.name, Toast.LENGTH_SHORT).show()
+            //viewModel.insertItem(it)
         }
 
     }
