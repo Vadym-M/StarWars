@@ -1,0 +1,11 @@
+package com.vinade.starwars.util
+
+import androidx.fragment.app.Fragment
+import com.vinade.starwars.model.Result
+
+interface Navigator {
+    fun showDetailFragment(result: Result)
+}
+fun Fragment.navigator() :Navigator{
+    return requireActivity() as Navigator
+}
