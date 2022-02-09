@@ -7,5 +7,7 @@ class Constants {
         const val DETAIL_FRAGMENT = "detail_fragment"
         const val HOME_FRAGMENT = "home_fragment"
         const val FAVORITE_FRAGMENT = "favorite_fragment"
+
+        const val ADDED_TO_FAVORITE = "Added to favorite"
     }
 }

@@ -1,13 +1,17 @@
 package com.vinade.starwars.view.fragments
 
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.vinade.starwars.R
 import com.vinade.starwars.databinding.FragmentDetailBinding
 import com.vinade.starwars.model.Film
@@ -21,12 +25,13 @@ import com.vinade.starwars.view.adapters.DetailAdapter
 import com.vinade.starwars.viewmodel.DetailViewModel
 import com.vinade.starwars.viewmodel.FavoriteViewModel
 import com.vinade.starwars.viewmodel.ViewModelFactory
+import java.util.ArrayList
 
 
 class DetailFragment : Fragment() {
 
-    lateinit var result: Result
-    lateinit var films: List<Film>
+    lateinit var character: Result
+    var films: List<Film>? = null
     private lateinit var binding: FragmentDetailBinding
     private lateinit var viewModelFavorite: FavoriteViewModel
     private lateinit var viewModel: DetailViewModel
@@ -35,8 +40,10 @@ class DetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        result = arguments?.getParcelable(KEY)!!
+        character = arguments?.getParcelable(KEY_F)!!
+        films = arguments?.getParcelableArrayList(KEY_S)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,19 +52,34 @@ class DetailFragment : Fragment() {
         val repo = DetailRepository()
         viewModel = ViewModelProvider(this, ViewModelFactory(repo))[DetailViewModel::class.java]
         initFavoriteViewModel()
+        isFavorite()
         initData()
         initTopBar()
+
+        viewModelFavorite.isExist.observe(viewLifecycleOwner){
+            character.isFavorite = it
+            setIsFavorite()
+        }
+
+        viewModelFavorite.callBack.observe(requireActivity()) {
+            showSnackBar(it)
+        }
+
         viewModel.films.observe(requireActivity()) { result ->
             when (result) {
-                is APIResult.Loading -> {showProgressBar()}
+                is APIResult.Loading -> {
+                    showProgressBar()
+                }
                 is APIResult.Success -> {
                     result.data?.let {
                         films = it
-                        adapterD.setAdapter(films)
+                        adapterD.setAdapter(films!!)
                         hideProgressBar()
                     }
                 }
-                is APIResult.Error -> { Toast.makeText(requireContext(), result.msg, Toast.LENGTH_SHORT).show()}
+                is APIResult.Error -> {
+                    Toast.makeText(requireContext(), result.msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         return binding.root
@@ -65,57 +87,108 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getFilm(result)
+        if (films != null) {
+            adapterD.setAdapter(films!!)
+            hideProgressBar()
+        } else {
+            viewModel.getFilms(character)
+        }
+
     }
 
-    private fun initData(){
+    private fun initData() {
         binding.apply {
-            detailEyeColor.text = getString(R.string.eye_color_s, result.eye_color)
-            detailGender.text = getString(R.string.gender_s, result.gender)
-            detailHairColor.text = getString(R.string.hair_color_s, result.hair_color)
-            detailHeight.text = getString(R.string.height_d, result.height)
-            detailMass.text = getString(R.string.mass_d, result.mass)
-            detailSkinColor.text = getString(R.string.skin_color_s, result.skin_color)
-            detailName.text = result.name
+            detailEyeColor.text = getString(R.string.eye_color_s, character.eye_color)
+            detailGender.text = getString(R.string.gender_s, character.gender)
+            detailHairColor.text = getString(R.string.hair_color_s, character.hair_color)
+            detailHeight.text = getString(R.string.height_d, character.height)
+            detailMass.text = getString(R.string.mass_d, character.mass)
+            detailSkinColor.text = getString(R.string.skin_color_s, character.skin_color)
+            detailName.text = character.name
+
+            if (character.isFavorite == true)
+            binding.topAppBar.menu[0].icon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart)
 
             adapterD = DetailAdapter()
             filmRecycler.adapter = adapterD
-            filmRecycler.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            filmRecycler.layoutManager =
+                LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
+
+
     }
-    private fun showProgressBar(){
+
+    private fun showProgressBar() {
         binding.filmProgressBar.visibility = View.VISIBLE
     }
-    private fun hideProgressBar(){
+
+    private fun hideProgressBar() {
         binding.filmProgressBar.visibility = View.GONE
     }
-    private fun initTopBar(){
+
+    private fun initTopBar() {
         binding.topAppBar.setNavigationOnClickListener {
             navigator().backPress()
         }
-        binding.topAppBar.setOnClickListener { item ->
-            when(item.id){
+        binding.topAppBar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
                 R.id.favorite -> {
-                    //favorite view model
+                    character.isFavorite = !character.isFavorite!!
+                    if(character.isFavorite!!) {
+                        setIsFavorite()
+                        viewModelFavorite.insertFavoritePerson(character)
+                        viewModelFavorite.insertFilms(films!!)
+                    }else {
+                        setIsFavorite()
+                        viewModelFavorite.deleteCharacter(character)
+                        viewModelFavorite.deleteFilms(films!!)
+                    }
+                    true
+                }
+                else -> {
+                    true
                 }
             }
         }
     }
 
-    private fun initFavoriteViewModel(){
-        val dao: StarWarsRoomDatabase = StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
+    private fun showSnackBar(msg: String) {
+        Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun initFavoriteViewModel() {
+        val dao: StarWarsRoomDatabase =
+            StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
         val repo = FavoriteRepository(dao.favoriteDao())
-        viewModelFavorite = ViewModelProvider(this, ViewModelFactory(repo))[FavoriteViewModel::class.java]
+        viewModelFavorite =
+            ViewModelProvider(this, ViewModelFactory(repo))[FavoriteViewModel::class.java]
+    }
+
+    private fun setIsFavorite(){
+        binding.topAppBar.menu[0].icon = if(character.isFavorite == true) {
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart)
+        }else{
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart_outline )
+        }
+    }
+
+    private fun isFavorite(){
+        viewModelFavorite.isExist(character)
     }
 
     companion object {
 
-        @JvmStatic val KEY = "datakey"
         @JvmStatic
-        fun newInstance(result: Result) =
+        val KEY_F = "characterKey"
+        @JvmStatic
+        val KEY_S = "filmsKey"
+
+        @JvmStatic
+        fun newInstance(result: Result, films: List<Film>?) =
             DetailFragment().apply {
                 arguments = Bundle().apply {
-                putParcelable(KEY, result)
+                    putParcelable(KEY_F, result)
+                    putParcelableArrayList(KEY_S, films as ArrayList<Film>?)
                 }
             }
     }

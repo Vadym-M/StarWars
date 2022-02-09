@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.vinade.starwars.R
 import com.vinade.starwars.databinding.ActivityMainBinding
+import com.vinade.starwars.model.Film
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.util.Constants.Companion.DETAIL_FRAGMENT
 import com.vinade.starwars.util.Constants.Companion.FAVORITE_FRAGMENT
@@ -59,8 +60,8 @@ class MainActivity : AppCompatActivity(), Navigator {
         binding.bottomNavigation.visibility = View.VISIBLE
     }
 
-    override fun showDetailFragment(result: Result) {
-        val fragment = DetailFragment.newInstance(result)
+    override fun showDetailFragment(result: Result, films: List<Film>?) {
+        val fragment = DetailFragment.newInstance(result, films)
         showFragment(fragment, "bs", DETAIL_FRAGMENT)
         hideBottomBar()
     }
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity(), Navigator {
         super.onBackPressed()
     }
 
-    override fun backPress() {
+    override fun backPress() { 
         onBackPressed()
     }
 }

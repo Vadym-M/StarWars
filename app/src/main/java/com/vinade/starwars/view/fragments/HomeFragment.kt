@@ -58,7 +58,8 @@ class HomeFragment : Fragment() {
             when(result){
                 is APIResult.Loading -> binding.homeProgressBar.visibility = View.VISIBLE
                 is APIResult.Success -> {
-                    result.data?.let { adapterSW.setAdapter(it)
+                    result.data?.let {
+                        adapterSW.setAdapter(it)
                         binding.homeProgressBar.visibility = View.GONE
                     }
                 }
@@ -68,7 +69,7 @@ class HomeFragment : Fragment() {
         }
 
         adapterSW.onItemClick = {
-            navigator().showDetailFragment(it)
+            navigator().showDetailFragment(it, null)
         }
 
     }

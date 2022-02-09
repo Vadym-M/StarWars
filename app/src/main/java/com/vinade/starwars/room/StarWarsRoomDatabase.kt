@@ -6,7 +6,7 @@ import com.vinade.starwars.model.Film
 import com.vinade.starwars.model.Result
 
 
-@Database(entities = [Result::class, Film::class], version = 3 ,exportSchema = true)
+@Database(entities = [Result::class, Film::class], version = 5 ,exportSchema = true)
 @TypeConverters(RoomConverter::class)
 abstract class StarWarsRoomDatabase : RoomDatabase() {
 
