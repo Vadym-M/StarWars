@@ -81,4 +81,8 @@ class MainActivity : AppCompatActivity(), Navigator {
 
         super.onBackPressed()
     }
+
+    override fun backPress() {
+        onBackPressed()
+    }
 }

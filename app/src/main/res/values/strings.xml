@@ -11,4 +11,5 @@
     <string name="eye_color_s">Eye color: %s</string>
     <string name="gender_s">Gender: %s</string>
     <string name="films">Films</string>
+    <string name="keyboard_backspace">Keyboard backspace</string>
 </resources>

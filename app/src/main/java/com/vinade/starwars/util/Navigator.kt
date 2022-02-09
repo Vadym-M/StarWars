@@ -5,6 +5,7 @@ import com.vinade.starwars.model.Result
 
 interface Navigator {
     fun showDetailFragment(result: Result)
+    fun backPress()
 }
 fun Fragment.navigator() :Navigator{
     return requireActivity() as Navigator

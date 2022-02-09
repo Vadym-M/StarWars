@@ -14,13 +14,13 @@ import java.lang.Exception
 class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel() {
     private var _result = MutableLiveData<APIResult<List<AdapterDataType>>>()
     val result: LiveData<APIResult<List<AdapterDataType>>>
-    get() = _result
+        get() = _result
 
     private var _favorites = MutableLiveData<List<Result>>()
     val favorites: LiveData<List<Result>>
         get() = _favorites
 
-    private val currentList  = mutableListOf<AdapterDataType>()
+    private val currentList = mutableListOf<AdapterDataType>()
 
     private var pageCounter = 1
     private var isProcess = false
@@ -29,38 +29,42 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
     init {
         getPeoplePage()
     }
-    fun getPeoplePage(){
-        if (!isProcess && !isLastPage){ viewModelScope.launch {
-                _result.value = APIResult.Loading()
-            isProcess = true
-            try {
-                val response = repository.getPeoplePage(pageCounter)
-                if(response.isSuccessful){
-                    currentList.add(AdapterDataType.Header("Page number: $pageCounter"))
-                    response.body()!!.results.forEach { currentList.add(AdapterDataType.Item(it)) }
-                    _result.value = APIResult.Success(currentList)
-                    pageCounter++
-                    if(response.body()!!.next == null){
-                        isLastPage = true
-                    }
-                }else{
-                    _result.value = APIResult.Error(response.message())
-                }
 
-            }catch (e :Exception){
-                _result.value = APIResult.Error(e.message.toString())
+    fun getPeoplePage() {
+        if (!isProcess && !isLastPage) {
+            viewModelScope.launch {
+                _result.value = APIResult.Loading()
+                isProcess = true
+                try {
+                    val response = repository.getPeoplePage(pageCounter)
+                    if (response.isSuccessful) {
+                        currentList.add(AdapterDataType.Header("Page number: $pageCounter"))
+                        response.body()!!.results.forEach { currentList.add(AdapterDataType.Item(it)) }
+                        _result.value = APIResult.Success(currentList)
+                        pageCounter++
+                        if (response.body()!!.next == null) {
+                            isLastPage = true
+                        }
+                    } else {
+                        _result.value = APIResult.Error(response.message())
+                    }
+
+                } catch (e: Exception) {
+                    _result.value = APIResult.Error(e.message.toString())
+                }
+                isProcess = false
             }
-            isProcess = false
         }
-    }}
-    fun getFavorites(){
+    }
+    ///
+    fun getFavorites() {
         viewModelScope.launch {
             val response = repository.getFavorites()
             _favorites.postValue(response)
         }
     }
 
-    fun insertItem(it: Result){
+    fun insertItem(it: Result) {
         viewModelScope.launch {
             repository.insert(it)
         }

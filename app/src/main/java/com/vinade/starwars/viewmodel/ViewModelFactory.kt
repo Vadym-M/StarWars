@@ -3,9 +3,10 @@ package com.vinade.starwars.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.vinade.starwars.repository.DetailRepository
+import com.vinade.starwars.repository.Repository
 import com.vinade.starwars.repository.StarWarsRepository
 
-class ViewModelFactory(private val repository: Any) : ViewModelProvider.Factory {
+class ViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (modelClass.isAssignableFrom(StarWarsViewModel::class.java)){
             StarWarsViewModel(repository as StarWarsRepository) as T

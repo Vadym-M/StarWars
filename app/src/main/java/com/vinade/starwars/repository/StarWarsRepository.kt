@@ -6,7 +6,7 @@ import com.vinade.starwars.network.RetrofitClient
 import com.vinade.starwars.room.StarWarsDao
 
 
-class StarWarsRepository(private val dao: StarWarsDao) {
+class StarWarsRepository(private val dao: StarWarsDao) : Repository{
 
     suspend fun getPeoplePage(page: Int) = RetrofitClient.apiStarWars.getPeoplePage(page)
 
