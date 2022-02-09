@@ -2,10 +2,11 @@ package com.vinade.starwars.room
 
 import android.content.Context
 import androidx.room.*
+import com.vinade.starwars.model.Film
 import com.vinade.starwars.model.Result
 
 
-@Database(entities = arrayOf(Result::class), version = 2 ,exportSchema = true)
+@Database(entities = [Result::class, Film::class], version = 3 ,exportSchema = true)
 @TypeConverters(RoomConverter::class)
 abstract class StarWarsRoomDatabase : RoomDatabase() {
 

@@ -1,6 +1,5 @@
 package com.vinade.starwars.view.fragments
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,21 +10,27 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vinade.starwars.R
 import com.vinade.starwars.databinding.FragmentDetailBinding
+import com.vinade.starwars.model.Film
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.DetailRepository
+import com.vinade.starwars.repository.FavoriteRepository
+import com.vinade.starwars.room.StarWarsRoomDatabase
 import com.vinade.starwars.util.APIResult
 import com.vinade.starwars.util.navigator
-import com.vinade.starwars.view.activities.MainActivity
 import com.vinade.starwars.view.adapters.DetailAdapter
 import com.vinade.starwars.viewmodel.DetailViewModel
+import com.vinade.starwars.viewmodel.FavoriteViewModel
 import com.vinade.starwars.viewmodel.ViewModelFactory
 
 
 class DetailFragment : Fragment() {
+
     lateinit var result: Result
-    lateinit var binding: FragmentDetailBinding
-    lateinit var viewModel: DetailViewModel
-    lateinit var adapterD: DetailAdapter
+    lateinit var films: List<Film>
+    private lateinit var binding: FragmentDetailBinding
+    private lateinit var viewModelFavorite: FavoriteViewModel
+    private lateinit var viewModel: DetailViewModel
+    private lateinit var adapterD: DetailAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +44,7 @@ class DetailFragment : Fragment() {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
         val repo = DetailRepository()
         viewModel = ViewModelProvider(this, ViewModelFactory(repo))[DetailViewModel::class.java]
+        initFavoriteViewModel()
         initData()
         initTopBar()
         viewModel.films.observe(requireActivity()) { result ->
@@ -46,7 +52,8 @@ class DetailFragment : Fragment() {
                 is APIResult.Loading -> {showProgressBar()}
                 is APIResult.Success -> {
                     result.data?.let {
-                        adapterD.setAdapter(it)
+                        films = it
+                        adapterD.setAdapter(films)
                         hideProgressBar()
                     }
                 }
@@ -82,10 +89,23 @@ class DetailFragment : Fragment() {
     private fun hideProgressBar(){
         binding.filmProgressBar.visibility = View.GONE
     }
-    fun initTopBar(){
+    private fun initTopBar(){
         binding.topAppBar.setNavigationOnClickListener {
             navigator().backPress()
         }
+        binding.topAppBar.setOnClickListener { item ->
+            when(item.id){
+                R.id.favorite -> {
+                    //favorite view model
+                }
+            }
+        }
+    }
+
+    private fun initFavoriteViewModel(){
+        val dao: StarWarsRoomDatabase = StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
+        val repo = FavoriteRepository(dao.favoriteDao())
+        viewModelFavorite = ViewModelProvider(this, ViewModelFactory(repo))[FavoriteViewModel::class.java]
     }
 
     companion object {

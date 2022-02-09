@@ -29,9 +29,9 @@ class DetailViewModel(private val repository: DetailRepository): ViewModel() {
     fun getFilm(person: Result) = viewModelScope.launch{
         _films.value = APIResult.Loading()
         try {
-            val newList = person.films.map { film ->
+            val newList = person.films?.map { film ->
                 async { repository.getFilms(film) }
-            }.map { it.await() }
+            }?.map { it.await() }
             _films.value = APIResult.Success(newList as List<Film>)
         }catch (e: Exception){
             _films.value = APIResult.Error(e.message.toString())
