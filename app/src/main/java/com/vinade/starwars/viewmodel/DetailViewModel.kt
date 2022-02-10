@@ -17,18 +17,21 @@ class DetailViewModel(private val repository: DetailRepository) : ViewModel() {
     val characterFilms: LiveData<APIResult<List<Film>>>
         get() = _characterFilms
 
-    private var _films: List<Film>? = null
+    private var _films = MutableLiveData<List<Film>>()
+    val films: LiveData<List<Film>>
+    get() = _films
 
 
     fun getCharacterFilms(character: Result) {
-        if (_films != null) {
-            val separatedList = _films!!.filter {
+        try {
+            val separatedList = _films.value!!.filter {
                 character.films.contains(it.url)
             }
             _characterFilms.value = APIResult.Success(separatedList)
-        } else {
+        }catch (e: Exception){
             getFilmsNetwork(character)
         }
+
     }
 
     private fun getFilmsNetwork(character: Result) = viewModelScope.launch {
@@ -36,7 +39,7 @@ class DetailViewModel(private val repository: DetailRepository) : ViewModel() {
         try {
             val response = repository.getFilms()
             if (response.isSuccessful) {
-                _films = response.body()!!.results
+                _films.value = response.body()!!.results
                 val separatedList = response.body()!!.results.filter {
                     character.films.contains(it.url)
                 }
@@ -53,7 +56,7 @@ class DetailViewModel(private val repository: DetailRepository) : ViewModel() {
         try {
             val response = repository.getFilms()
             if (response.isSuccessful)
-                _films = response.body()!!.results
+                _films.value = response.body()!!.results
         } catch (e: Exception) {
         }
 

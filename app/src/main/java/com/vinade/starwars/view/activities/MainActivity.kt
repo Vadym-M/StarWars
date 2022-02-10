@@ -60,8 +60,8 @@ class MainActivity : AppCompatActivity(), Navigator {
         binding.bottomNavigation.visibility = View.VISIBLE
     }
 
-    override fun showDetailFragment(result: Result, films: List<Film>?) {
-        val fragment = DetailFragment.newInstance(result, films)
+    override fun showDetailFragment(result: Result) {
+        val fragment = DetailFragment.newInstance(result)
         showFragment(fragment, "bs", DETAIL_FRAGMENT)
         hideBottomBar()
     }

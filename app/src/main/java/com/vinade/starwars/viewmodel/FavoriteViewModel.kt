@@ -47,11 +47,13 @@ class FavoriteViewModel(private val repository: FavoriteRepository) : ViewModel(
         }
         _favorites.value = currentList
     }
-    fun getFilms(person: Result) {
-
+    fun getFilms(character: Result) {
         viewModelScope.launch {
-            val list = person.films.map { repository.getFilmByUrl(it) }
-            _films.value = list
+            val list = repository.getFilmByUrl()
+            val separatedList = list.filter {
+                character.films.contains(it.url)
+            }
+            _films.value = separatedList
         }
 
     }

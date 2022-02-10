@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
 
 
         adapterSW.onItemClick = {
-            navigator().showDetailFragment(it, null)
+            navigator().showDetailFragment(it)
         }
 
     }
@@ -59,9 +59,7 @@ class HomeFragment : Fragment() {
         val repo = DetailRepository()
         viewModelDetail = ViewModelProvider(requireActivity(), ViewModelFactory(repo))[DetailViewModel::class.java]
         viewModelDetail.getFilms()
-        val dao: StarWarsRoomDatabase =
-            StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
-        val repos = StarWarsRepository(dao.favoriteDao())
+        val repos = StarWarsRepository()
         viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(repos))[StarWarsViewModel::class.java]
     }
 

@@ -12,7 +12,7 @@ class FavoriteRepository(private val dao: StarWarsDao) : Repository {
 
     suspend fun getAllFavorites() = dao.getFavorites()
 
-    suspend fun getFilmByUrl(url: String) = dao.getFilmByUrl(url)
+    suspend fun getFilmByUrl() = dao.getFilms()
 
     suspend fun isExist(url:String) = dao.isExist(url)
 

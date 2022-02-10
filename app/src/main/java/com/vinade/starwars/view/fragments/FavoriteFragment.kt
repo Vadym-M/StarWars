@@ -5,11 +5,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.vinade.starwars.databinding.FragmentFavoriteBinding
-import com.vinade.starwars.model.Film
 import com.vinade.starwars.repository.FavoriteRepository
 import com.vinade.starwars.room.StarWarsRoomDatabase
 import com.vinade.starwars.util.navigator
@@ -20,7 +18,7 @@ import com.vinade.starwars.viewmodel.ViewModelFactory
 
 class FavoriteFragment : Fragment() {
 
-    lateinit var binding: FragmentFavoriteBinding
+    private lateinit var binding: FragmentFavoriteBinding
     lateinit var viewModel: FavoriteViewModel
     lateinit var adapterSW: StarWarsAdapter
 
@@ -48,11 +46,8 @@ class FavoriteFragment : Fragment() {
         }
 
         adapterSW.onItemClick = {res->
-            val observer = Observer<List<Film>>{films ->
-                navigator().showDetailFragment(res, films)
-            }
-            viewModel.films.observe(viewLifecycleOwner, observer)
-            viewModel.getFilms(res)
+            navigator().showDetailFragment(res)
+
         }
     }
 

@@ -42,11 +42,13 @@ class DetailFragment : Fragment() {
         super.onCreate(savedInstanceState)
         initViewModels()
         character = arguments?.getParcelable(KEY_F)!!
-        films = arguments?.getParcelableArrayList(KEY_S)
 
         if (films == null) {
             viewModel.getCharacterFilms(character)
+        }else{
+            viewModelFavorite.getFilms(character)
         }
+
 
 
     }
@@ -60,6 +62,10 @@ class DetailFragment : Fragment() {
         isFavorite()
         initData()
         initTopBar()
+
+        viewModel.films.observe(viewLifecycleOwner){
+            viewModelFavorite.insertFilms(it)
+        }
 
         viewModelFavorite.isExist.observe(viewLifecycleOwner){
             character.isFavorite = it
@@ -98,6 +104,7 @@ class DetailFragment : Fragment() {
         } else {
             viewModel.getCharacterFilms(character)
         }
+
 
     }
 
@@ -142,11 +149,9 @@ class DetailFragment : Fragment() {
                     if(character.isFavorite!!) {
                         setIsFavorite()
                         viewModelFavorite.insertFavoritePerson(character)
-                        viewModelFavorite.insertFilms(films!!)
                     }else {
                         setIsFavorite()
                         viewModelFavorite.deleteCharacter(character)
-                        viewModelFavorite.deleteFilms(films!!)
                     }
                     true
                 }
@@ -182,22 +187,19 @@ class DetailFragment : Fragment() {
         val repos = FavoriteRepository(dao.favoriteDao())
         viewModelFavorite =
             ViewModelProvider(this, ViewModelFactory(repos))[FavoriteViewModel::class.java]
-        Log.d("debug", "HashCode: " + viewModel.hashCode().toString())
     }
 
     companion object {
 
         @JvmStatic
         val KEY_F = "characterKey"
-        @JvmStatic
-        val KEY_S = "filmsKey"
 
         @JvmStatic
-        fun newInstance(result: Result, films: List<Film>?) =
+        fun newInstance(result: Result) =
             DetailFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(KEY_F, result)
-                    putParcelableArrayList(KEY_S, films as ArrayList<Film>?)
+
                 }
             }
     }
