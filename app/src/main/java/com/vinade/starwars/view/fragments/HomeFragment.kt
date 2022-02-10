@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vinade.starwars.databinding.FragmentHomeBinding
 import com.vinade.starwars.repository.DetailRepository
 import com.vinade.starwars.repository.StarWarsRepository
-import com.vinade.starwars.room.StarWarsRoomDatabase
 import com.vinade.starwars.util.APIResult
 import com.vinade.starwars.util.navigator
 import com.vinade.starwars.view.adapters.StarWarsAdapter
@@ -48,6 +48,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         recyclerListener()
         resultListener()
+        searchViewListener()
 
 
         adapterSW.onItemClick = {
@@ -55,6 +56,25 @@ class HomeFragment : Fragment() {
         }
 
     }
+
+    private fun searchViewListener() {
+        binding.homeSearchView.setOnQueryTextListener(
+            object : SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(p0: String?): Boolean {
+                    Log.d("debug", p0.toString())
+                    return false
+                }
+
+                override fun onQueryTextChange(p0: String?): Boolean {
+                    Log.d("debug", p0.toString())
+                    viewModel.getPeopleByQuery(p0.toString())
+                    return false
+                }
+
+            }
+        )
+    }
+
     private fun initViewModels(){
         val repo = DetailRepository()
         viewModelDetail = ViewModelProvider(requireActivity(), ViewModelFactory(repo))[DetailViewModel::class.java]
@@ -75,7 +95,7 @@ class HomeFragment : Fragment() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     super.onScrollStateChanged(recyclerView, newState)
                     if (!binding.homeRecycler.canScrollVertically(1)) {
-                        viewModel.getPeoplePage()
+                        viewModel.recyclerChanged()
                     }
                 }
             }
