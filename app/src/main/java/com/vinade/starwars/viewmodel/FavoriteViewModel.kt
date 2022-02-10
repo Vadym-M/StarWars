@@ -1,6 +1,5 @@
 package com.vinade.starwars.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.vinade.starwars.model.Film
 import com.vinade.starwars.model.Result
 import com.vinade.starwars.repository.FavoriteRepository
-import com.vinade.starwars.util.APIResult
 import com.vinade.starwars.util.AdapterDataType
 import com.vinade.starwars.util.Constants.Companion.ADDED_TO_FAVORITE
 import kotlinx.coroutines.launch
@@ -52,8 +50,8 @@ class FavoriteViewModel(private val repository: FavoriteRepository) : ViewModel(
     fun getFilms(person: Result) {
 
         viewModelScope.launch {
-            val list = person.films?.map { repository.getFilmByUrl(it) }
-            _films.value = list!!
+            val list = person.films.map { repository.getFilmByUrl(it) }
+            _films.value = list
         }
 
     }
