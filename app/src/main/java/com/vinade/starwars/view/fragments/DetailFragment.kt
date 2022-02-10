@@ -1,7 +1,7 @@
 package com.vinade.starwars.view.fragments
 
 import android.os.Bundle
-import android.os.Parcelable
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -40,8 +40,15 @@ class DetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initViewModels()
         character = arguments?.getParcelable(KEY_F)!!
         films = arguments?.getParcelableArrayList(KEY_S)
+
+        if (films == null) {
+            viewModel.getCharacterFilms(character)
+        }
+
+
     }
 
     override fun onCreateView(
@@ -49,9 +56,7 @@ class DetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
-        val repo = DetailRepository()
-        viewModel = ViewModelProvider(this, ViewModelFactory(repo))[DetailViewModel::class.java]
-        initFavoriteViewModel()
+
         isFavorite()
         initData()
         initTopBar()
@@ -65,7 +70,7 @@ class DetailFragment : Fragment() {
             showSnackBar(it)
         }
 
-        viewModel.films.observe(requireActivity()) { result ->
+        viewModel.characterFilms.observe(requireActivity()) { result ->
             when (result) {
                 is APIResult.Loading -> {
                     showProgressBar()
@@ -91,7 +96,7 @@ class DetailFragment : Fragment() {
             adapterD.setAdapter(films!!)
             hideProgressBar()
         } else {
-            viewModel.getFilms(character)
+            viewModel.getCharacterFilms(character)
         }
 
     }
@@ -156,14 +161,6 @@ class DetailFragment : Fragment() {
         Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
     }
 
-    private fun initFavoriteViewModel() {
-        val dao: StarWarsRoomDatabase =
-            StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
-        val repo = FavoriteRepository(dao.favoriteDao())
-        viewModelFavorite =
-            ViewModelProvider(this, ViewModelFactory(repo))[FavoriteViewModel::class.java]
-    }
-
     private fun setIsFavorite(){
         binding.topAppBar.menu[0].icon = if(character.isFavorite == true) {
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_heart)
@@ -174,6 +171,18 @@ class DetailFragment : Fragment() {
 
     private fun isFavorite(){
         viewModelFavorite.isExist(character)
+    }
+
+    private fun initViewModels() {
+        val repo = DetailRepository()
+        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(repo))[DetailViewModel::class.java]
+
+        val dao: StarWarsRoomDatabase =
+            StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
+        val repos = FavoriteRepository(dao.favoriteDao())
+        viewModelFavorite =
+            ViewModelProvider(this, ViewModelFactory(repos))[FavoriteViewModel::class.java]
+        Log.d("debug", "HashCode: " + viewModel.hashCode().toString())
     }
 
     companion object {

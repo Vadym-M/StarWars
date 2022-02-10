@@ -1,6 +1,7 @@
 package com.vinade.starwars.view.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +11,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vinade.starwars.databinding.FragmentHomeBinding
+import com.vinade.starwars.repository.DetailRepository
 import com.vinade.starwars.repository.StarWarsRepository
 import com.vinade.starwars.room.StarWarsRoomDatabase
 import com.vinade.starwars.util.APIResult
 import com.vinade.starwars.util.navigator
 import com.vinade.starwars.view.adapters.StarWarsAdapter
+import com.vinade.starwars.viewmodel.DetailViewModel
 import com.vinade.starwars.viewmodel.StarWarsViewModel
 import com.vinade.starwars.viewmodel.ViewModelFactory
 
@@ -23,11 +26,12 @@ class HomeFragment : Fragment() {
 
     lateinit var binding: FragmentHomeBinding
     lateinit var viewModel: StarWarsViewModel
+    lateinit var viewModelDetail: DetailViewModel
     lateinit var adapterSW: StarWarsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initViewModel()
+        initViewModels()
     }
 
     override fun onCreateView(
@@ -51,12 +55,14 @@ class HomeFragment : Fragment() {
         }
 
     }
-    private fun initViewModel(){
-
+    private fun initViewModels(){
+        val repo = DetailRepository()
+        viewModelDetail = ViewModelProvider(requireActivity(), ViewModelFactory(repo))[DetailViewModel::class.java]
+        viewModelDetail.getFilms()
         val dao: StarWarsRoomDatabase =
             StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
-        val repo = StarWarsRepository(dao.favoriteDao())
-        viewModel = ViewModelProvider(this, ViewModelFactory(repo))[StarWarsViewModel::class.java]
+        val repos = StarWarsRepository(dao.favoriteDao())
+        viewModel = ViewModelProvider(requireActivity(), ViewModelFactory(repos))[StarWarsViewModel::class.java]
     }
 
     private fun recyclerListener(){

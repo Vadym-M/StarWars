@@ -16,10 +16,6 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
     val result: LiveData<APIResult<List<AdapterDataType>>>
         get() = _result
 
-    private var _favorites = MutableLiveData<List<Result>>()
-    val favorites: LiveData<List<Result>>
-        get() = _favorites
-
     private val currentList = mutableListOf<AdapterDataType>()
 
     private var pageCounter = 1
@@ -56,26 +52,5 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
             }
         }
     }
-    ///
-    fun getFavorites() {
-        viewModelScope.launch {
-            val response = repository.getFavorites()
-            _favorites.postValue(response)
-        }
-    }
 
-    fun insertItem(it: Result) {
-        viewModelScope.launch {
-            repository.insert(it)
-        }
-    }
-
-    fun deleteFavorite(favorite: Result) = viewModelScope.launch {
-        val list = _favorites.value as MutableList
-        val index = list.indexOf(favorite)
-        list.remove(favorite)
-        _favorites.postValue(list as List<Result>)
-
-        repository.deleteFavoriteByName(favorite.name)
-    }
 }
