@@ -25,37 +25,61 @@ class HomeFragment : Fragment() {
     lateinit var viewModel: StarWarsViewModel
     lateinit var adapterSW: StarWarsAdapter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initViewModel()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        adapterSW = StarWarsAdapter()
-        binding.homeRecycler.apply {
-            adapter = adapterSW
-            layoutManager = LinearLayoutManager(requireContext())
-        }
-        binding.homeRecycler.addOnScrollListener(
-            object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    super.onScrollStateChanged(recyclerView, newState)
-                    if(!binding.homeRecycler.canScrollVertically(1)){
-                        viewModel.getPeoplePage()
-                    }
-                }
-            }
-        )
-        val dao: StarWarsRoomDatabase = StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
-        val repo = StarWarsRepository(dao.favoriteDao())
-        viewModel = ViewModelProvider(this, ViewModelFactory(repo))[StarWarsViewModel::class.java]
+
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        recyclerListener()
+        resultListener()
 
-        viewModel.result.observe(viewLifecycleOwner) {result->
-            when(result){
+
+        adapterSW.onItemClick = {
+            navigator().showDetailFragment(it, null)
+        }
+
+    }
+    private fun initViewModel(){
+
+        val dao: StarWarsRoomDatabase =
+            StarWarsRoomDatabase.getDatabase(requireContext().applicationContext)
+        val repo = StarWarsRepository(dao.favoriteDao())
+        viewModel = ViewModelProvider(this, ViewModelFactory(repo))[StarWarsViewModel::class.java]
+    }
+
+    private fun recyclerListener(){
+        adapterSW = StarWarsAdapter()
+        binding.homeRecycler.apply {
+            adapter = adapterSW
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+
+        binding.homeRecycler.addOnScrollListener(
+            object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!binding.homeRecycler.canScrollVertically(1)) {
+                        viewModel.getPeoplePage()
+                    }
+                }
+            }
+        )
+    }
+    private fun resultListener(){
+        viewModel.result.observe(viewLifecycleOwner) { result ->
+            when (result) {
                 is APIResult.Loading -> binding.homeProgressBar.visibility = View.VISIBLE
                 is APIResult.Success -> {
                     result.data?.let {
@@ -63,15 +87,14 @@ class HomeFragment : Fragment() {
                         binding.homeProgressBar.visibility = View.GONE
                     }
                 }
-                is APIResult.Error -> Toast.makeText(requireContext(), result.msg, Toast.LENGTH_SHORT).show()
+                is APIResult.Error -> Toast.makeText(
+                    requireContext(),
+                    result.msg,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
         }
-
-        adapterSW.onItemClick = {
-            navigator().showDetailFragment(it, null)
-        }
-
     }
 
 }
