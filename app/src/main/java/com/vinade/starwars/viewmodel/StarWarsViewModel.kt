@@ -1,5 +1,6 @@
 package com.vinade.starwars.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,7 +27,7 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
         getPeoplePage()
     }
 
-    fun getPeoplePage() {
+    private fun getPeoplePage() {
         if (!isProcess && !isLastPage) {
             viewModelScope.launch {
                 _result.value = APIResult.Loading()
@@ -50,6 +51,41 @@ class StarWarsViewModel(private val repository: StarWarsRepository) : ViewModel(
                 }
                 isProcess = false
             }
+        }
+    }
+
+    fun getPeopleByQuery(query: String?) {
+        if (query == ""){
+            currentList.clear()
+            pageCounter = 1
+            getPeoplePage()
+        }else{
+        viewModelScope.launch {
+            pageCounter = 0
+            currentList.clear()
+            _result.value = APIResult.Loading()
+            try {
+                val response = repository.getPeopleByQuery(query!!)
+                if (response.isSuccessful) {
+
+                    response.body()!!.results.forEach { currentList.add(AdapterDataType.Item(it)) }
+                    _result.value = APIResult.Success(currentList)
+                } else {
+                    _result.value = APIResult.Error(response.message())
+                }
+
+            } catch (e: Exception) {
+                _result.value = APIResult.Error(e.message.toString())
+            }
+
+        }
+        }
+    }
+
+    fun recyclerChanged() {
+        if (pageCounter != 0){
+            Log.d("debug", "HERE")
+            getPeoplePage()
         }
     }
 
