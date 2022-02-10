@@ -8,4 +8,6 @@ import retrofit2.http.Query
 interface ApiStarWars {
     @GET("people/")
     suspend fun getPeoplePage(@Query("page") page: Int):Response<StarWarsResult>
+    @GET("people/")
+    suspend fun getPeopleByQuery(@Query("search") search: String): Response<StarWarsResult>
 }
