@@ -40,9 +40,6 @@ class FavoriteViewModel(private val repository: FavoriteRepository) : ViewModel(
     }
     fun insertFilms(films: List<Film>) = viewModelScope.launch{
         repository.insertFilm(films)
-//        films.forEach { film ->
-//            repository.insertFilm(film)
-//        }
     }
     fun getAllFavorites() = viewModelScope.launch {
         val response = repository.getAllFavorites()
